@@ -1,0 +1,11 @@
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+.Renviron
+.Renviron.*
+.Rcheck/
+*.Rproj
+*.Rcheck/
+*.tar.gz
+Rplots.pdf

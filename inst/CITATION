@@ -1,0 +1,7 @@
+bibentry(
+    bibtype = "Manual",
+    title = "cusumtests: Recursive CUSUM and CUSUM of Squares Tests",
+    author = eval(str2lang(meta[["Authors@R"]]), envir = asNamespace("utils")),
+    year = "2026",
+    note = paste("R package version", meta$Version)
+)

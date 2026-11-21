@@ -1,0 +1,8 @@
+^paper$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^\.gitignore$
+^checks\.R$
+^CONTRIBUTING\.md$
+^LICENSE\.md$

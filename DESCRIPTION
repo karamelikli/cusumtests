@@ -1,0 +1,38 @@
+Package: cusumtests
+Type: Package
+Title: Recursive CUSUM and CUSUM of Squares Tests
+Version: 0.1.0
+Authors@R:
+  c(person(given = "Huseyin",
+           family = "karamelikli",
+           role = c("aut", "cre"),
+           email = "hakperest@gmail.com",
+           comment = c(ORCID = "0000-0001-7622-0972")),
+    person(given = "Huseyin Utku",
+           family = "Demir",
+           role = "aut",
+           comment = c(ORCID = "0000-0002-9140-0362"))
+           )
+Maintainer: Huseyin karamelikli <hakperest@gmail.com>
+Description: Tests the stability of ordered linear regression models using
+    cumulative sums and cumulative sums of squares of recursive residuals.
+    For each test, Gaussian Monte Carlo draws on the observed residual grid
+    provide a two-sided p-value and matching simultaneous significance bands
+    and decisions at the 1, 5, and 10 percent levels. Results include a
+    decision table and plotting data. See Brown, Durbin and Evans (1975)
+    <doi:10.1111/j.2517-6161.1975.tb01532.x>.
+License: GPL-3
+URL: https://github.com/karamelikli/cusumtests
+BugReports: https://github.com/karamelikli/cusumtests/issues
+Encoding: UTF-8
+Imports: graphics, stats, strucchange
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/Needs/documentation: roxygen2, srr
+Config/roxygen2/markdown: TRUE
+Config/roxygen2/packages: srr
+Config/roxygen2/version: 8.0.0
+Config/testthat/edition: 3

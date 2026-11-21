@@ -1,0 +1,119 @@
+---
+title: "Testing Regression Stability with cusumtests"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Testing Regression Stability with cusumtests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE, comment = "#>", fig.width = 6.5, fig.height = 4.5
+)
+library(cusumtests)
+```
+
+## Fit an ordered regression
+
+Recursive residuals are standardized one-step-ahead prediction errors.
+Their order determines the paths, so arrange the data in the order you want
+to test before fitting the regression. The first `k` rows of the fitted design
+must identify all `k` coefficients, and at least two fitted rows must follow.
+
+The monthly `Seatbelts` data are already in chronological order. The
+following example models the number of drivers killed as a function of
+distance driven and petrol price.
+
+```{r fit}
+belts <- as.data.frame(datasets::Seatbelts)
+month <- seq(as.Date("1969-01-01"), by = "month", length.out = nrow(belts))
+fit <- lm(DriversKilled ~ log(kms) + PetrolPrice, data = belts)
+```
+
+## Run CUSUM and CUSUMQ
+
+`cusum()` adds the signed recursive residuals. Persistent forecast errors
+of the same sign can pull its path away from zero. `cusumq()` adds the squared
+residuals as shares of their total. Its path can depart from the diagonal
+when large forecast errors are concentrated in part of the sample.
+`cusumQ()` is an alias for `cusumq()`.
+
+Pass a `time` vector to label the horizontal axis. It needs one entry per
+fitted row after any subsetting or omission of missing values. Both tests use
+all three significance levels by default.
+
+```{r both-tests}
+signed <- cusum(fit, B = 4999, seed = 17, time = month)
+squared <- cusumq(fit, B = 4999, seed = 17, time = month)
+
+signed
+squared$decisions
+```
+
+The printed p-value describes the largest departure over the path. The
+decision table gives the cutoff and rejection indicator at each level. A
+failure to reject means the observed departure was compatible with the
+reference at that level.
+
+## Plot and inspect the bands
+
+The default plot displays the path and every calculated band. Pass `alpha`
+to display a subset of the stored levels using the existing calibration.
+
+```{r plots, fig.show="hold"}
+plot(signed, xlab = "Month")
+plot(squared, alpha = 0.05, xlab = "Month")
+```
+
+The `data` component has one row per recursive residual and significance
+level. Inspect one level to get a single copy of the path and its bounds.
+
+```{r band-data}
+band_5 <- subset(squared$data, alpha == 0.05)
+head(band_5)
+
+crossed <- with(band_5, cusumq < lower | cusumq > upper)
+any(crossed)
+squared$p.value <= 0.05
+```
+
+For a result containing only 5% bands and decisions, pass `alpha` to the test.
+
+```{r one-level}
+cusum(fit, alpha = 0.05, B = 4999, seed = 17)$decisions
+```
+
+## Detect a simulated mean shift
+
+Here the observations are independent, with the second half shifted by
+1.5 units. The fitted intercept assumes a constant mean throughout.
+
+```{r mean-shift}
+set.seed(42)
+observation <- seq_len(160)
+response <- rnorm(length(observation)) + 1.5 * (observation > 80)
+shift_fit <- lm(response ~ 1)
+
+shift_test <- cusum(shift_fit, B = 4999, seed = 17)
+shift_test
+plot(shift_test, alpha = 0.05)
+```
+
+A crossing gives evidence against the reference model. The time of that
+crossing can differ from the date the underlying change first occurred.
+
+## Choose the calibration settings
+
+For each test, the same null draws determine the Monte Carlo p-value and
+the critical values for the simultaneous bands. Use `seed` to reproduce
+the calibration with the same random-number settings. When a result is
+near a threshold, a larger `B` reduces simulation variability.
+
+The finite-sample reference assumes fixed regressors and independent,
+homoskedastic Gaussian errors under the null. Residual dependence,
+heteroskedasticity, heavy tails, and lagged outcomes can change the
+reference distribution. The `Seatbelts` regression illustrates the
+workflow with monthly data, where serial dependence and seasonality are
+plausible. See `help("cusum", package = "cusumtests")` for model
+requirements and the full result structure.
