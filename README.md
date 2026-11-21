@@ -1,5 +1,7 @@
 # cusumtests
 
+[![R-CMD-check](https://github.com/karamelikli/cusumtests/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/karamelikli/cusumtests/actions/workflows/R-CMD-check.yaml)
+
 Run recursive CUSUM and CUSUM of squares tests on an ordered linear regression.
 For each diagnostic, the same finite-sample Gaussian Monte Carlo draws
 produce the two-sided p-value and simultaneous significance bands at 1%, 5%,
